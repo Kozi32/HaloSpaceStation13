@@ -13,9 +13,6 @@
 		/datum/job/researcher,\
 		/datum/job/ONIGUARD,\
 		/datum/job/ONIGUARDS,\
-		/datum/job/soe_commando,\
-		/datum/job/soe_commando_officer,\
-		/datum/job/soe_commando_captain,\
 		/datum/job/bertelsODST,\
 		/datum/job/bertelsODSTO,\
 		/datum/job/covenant/sangheili_minor,\
@@ -42,7 +39,7 @@
 	var/datum/objective/retrieve/nav_data/cole_protocol/obj2 = locate() in GLOB.UNSC.all_objectives
 	obj2.fake = 1
 
-	var/datum/objective/destroy_ship/unsc_cov/obj3 = locate() in GLOB.UNSC.all_objectives
+	var/datum/objective/overmap/unsc_cov_ship/obj3 = locate() in GLOB.UNSC.all_objectives
 	obj3.fake = 1
 
 	var/datum/objective/retrieve/artifact/unsc/obj4 = locate() in GLOB.UNSC.all_objectives

@@ -11,17 +11,19 @@
 "You bastards.","Automated Alert: Fuel lines damaged. Multiple hull breaches. Immediate assistance required."\
 )
 #define ALL_CIVILIANS_SHIPNAMES list(\
-"Pete's Cube","The Nomad","The Alexander","Free Range","Bigger Stick","Fist of Sol","Hammerhead","Spirit of Jupiter","Trident","The Messenger","Slow But Steady","Road Less Travelled","Dawson's Christian","Flexi Taped","Paycheck","Distant Home"\
+"Pete's Cube","The Nomad","The Alexander","Free Range","Heavenly Punisher","Sky Ruler","Bare Necessities","Arizona Killer","Iron Horse","Linebacker","Last Light","Hopes Eclipse","Fleeting Dawn","Titans Might","Despacito","Skippy","No True Scotsman","Blade Of Mars","Targeting Solution","Wooden Cat","The Cerberus","Message of Peace","Persian Persuader","Beowulf","Trojan Horse","Jade Dragon","Danger Zone","Bigger Stick","Fist of Sol","Hammerhead","Spirit of Jupiter","Trident","The Messenger","Slow But Steady","Road Less Travelled","Dawson's Christian","Flexi Taped","Paycheck","Distant Home","Mileage May Vary","Pimp Hand"\
 )
 
 #define STOP_WAIT_TIME 5 MINUTES
 #define STOP_DISEMBARK_TIME 2 MINUTES
 
-#define BROADCAST_ON_HIT_PROB 15
+#define BROADCAST_ON_HIT_PROB 20
 
 #define ICON_FILES_PICKFROM list('code/modules/halo/overmap/freighter.dmi','code/modules/halo/icons/overmap/large_cargo_ship.dmi','code/modules/halo/icons/overmap/medical_ship.dmi','code/modules/halo/icons/overmap/mariner-class.dmi','code/modules/halo/icons/overmap/heavy_freighter.dmi')
 
 #define LIGHTRANGE_LIKELY_UNUSED 99
+
+#define FLEET_STICKBY_RANGE 2 //The max range a fleet-bound ship will stay from the fleet leader.
 
 /obj/effect/overmap/ship/npc_ship
 	name = "Ship"
@@ -68,6 +70,7 @@
 	name = pick(ship_name_list)
 
 /obj/effect/overmap/ship/npc_ship/Initialize()
+	my_faction = GLOB.factions_by_name[get_faction()]
 	generate_ship_name()
 	pick_ship_icon()
 	var/turf/start_turf = locate(x,y,z)
@@ -150,6 +153,9 @@
 	target_loc = pick(GLOB.overmap_tiles_uncontrolled)
 
 /obj/effect/overmap/ship/npc_ship/proc/pick_target_loc()
+	if(our_fleet && our_fleet.leader_ship != src)
+		target_loc = pick(range(FLEET_STICKBY_RANGE,our_fleet.leader_ship.loc))
+		return
 	var/list/sectors_onmap = list()
 	for(var/type in typesof(/obj/effect/overmap/sector) - /obj/effect/overmap/sector)
 		var/obj/effect/overmap/om_obj = locate(type)
@@ -185,10 +191,11 @@
 		if(loc == target_loc)
 			pick_target_loc()
 		else
-
 			walk(src,get_dir(src,target_loc),move_delay)
 			dir = get_dir(src,target_loc)
 			is_still() //A way to ensure umbilicals break when we move.
+			if(our_fleet && our_fleet.ships_infleet.len > 1 && target_loc != null)
+				pick_target_loc()
 	else
 		if(is_player_controlled())
 			. = ..()
@@ -210,6 +217,7 @@
 	hull -= proj.damage
 	if(hull <= initial(hull)/4 && target_loc)
 		broadcast_hit(1)
+		target_loc = null
 	else
 		if(prob(BROADCAST_ON_HIT_PROB)) //If we get the probability, broadcast the hit.
 			broadcast_hit()

@@ -1,4 +1,5 @@
 GLOBAL_LIST_EMPTY(capture_nodes)
+#define FALLBACK_MOBSPAWN_AMOUNT 4
 
 /obj/machinery/computer/capture_node
 	name = "Sovereignty Console"
@@ -6,11 +7,13 @@ GLOBAL_LIST_EMPTY(capture_nodes)
 	icon_screen = "comm_monitor"
 	desc = "Used to determine who controls this area."
 	var/control_faction
+	var/comms_from = "Geminus Sovereignty Update"//The origin of comms messages sent by this console.
 	var/list/capturing_factions = list("UNSC","Insurrection","Covenant")
 	var/list/faction_frequencies = list()
 	var/list/faction_languages = list()
 	var/capture_time = 8 SECONDS
 	var/mob/living/interacting
+	var/list/capture_npc_spawnlocs = list()
 
 /obj/machinery/computer/capture_node/New()
 	. = ..()
@@ -19,6 +22,11 @@ GLOBAL_LIST_EMPTY(capture_nodes)
 	name = "[A] Sovereignty Console"
 
 	GLOB.capture_nodes.Add(src)
+
+/obj/machinery/computer/capture_node/Initialize()
+	. = ..()
+	for(var/obj/effect/landmark/npc_capturespawn_marker/marker in loc.loc.contents)
+		capture_npc_spawnlocs += marker.loc
 
 /obj/machinery/computer/capture_node/Destroy()
 	GLOB.capture_nodes.Remove(src)
@@ -74,6 +82,20 @@ GLOBAL_LIST_EMPTY(capture_nodes)
 		for(var/datum/objective/colony_capture/O in F.all_objectives)
 			O.node_contested(src, control_faction, trigger_faction)
 
+/obj/machinery/computer/capture_node/proc/spawn_defenders()
+	var/datum/faction/F = GLOB.factions_by_name[control_faction]
+	var/list/defenders_spawn = F.defender_mob_types
+	if(defenders_spawn.len == 0)
+		return
+	if(capture_npc_spawnlocs.len == 0)
+		for(var/i = 0,i < FALLBACK_MOBSPAWN_AMOUNT,i++)
+			var/to_spawn = pickweight(defenders_spawn)
+			new to_spawn (pick(view(7,src)))
+		return
+	for(var/turf/t in capture_npc_spawnlocs)
+		var/to_spawn = pick(defenders_spawn)
+		new to_spawn (t)
+
 /obj/machinery/computer/capture_node/proc/control_markers(var/owner_faction, var/trigger_faction)
 
 	var/area/A = get_area(src)
@@ -94,7 +116,8 @@ GLOBAL_LIST_EMPTY(capture_nodes)
 				O.node_reset(src, old_faction, trigger_faction)
 
 	if(control_faction)
-		minor_announcement.Announce("[control_faction] has captured the [src]!","Geminus Sovereignty Update")
+		minor_announcement.Announce("[control_faction] has captured the [src]!",comms_from)
+	spawn_defenders()
 
 /obj/machinery/computer/capture_node/proc/reset_markers()
 	var/area/A = get_area(src)
@@ -172,3 +195,10 @@ GLOBAL_LIST_EMPTY(capture_nodes)
 	overlays -= faction_logo
 	faction_logo.alpha = new_alpha
 	overlays += faction_logo
+
+
+
+
+
+/obj/effect/landmark/npc_capturespawn_marker
+	name = "Capture-Spawn marker"
