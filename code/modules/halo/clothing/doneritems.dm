@@ -1280,24 +1280,36 @@ obj/item/clothing/head/helmet/odst/donator/pinstripe
 
 //Marine
 
-/obj/item/clothing/head/helmet/marine/riley
-	name = " CH252MC-V modified helmet"
+/obj/item/clothing/head/helmet/eva/marine/riley
+	desc = "a white helmet  for UNSC pilots, wich safe for EVA"
+	name = "Helmet POI-89 Pilot Helmet"
 	item_state = "riley-helmet_worn"
 	icon_state = "riley-helmet_obj"
-	desc = " this is a CH252MC-V modified helmet of the CH252-V version, it contains a 1 eye visor, and a blue cross instead of a  red one , also it seems to have holographic cat ears attached"
 
-/obj/item/clothing/suit/storage/marine/riley
-	desc = "this is an  M52BMC a modified M52B marine armor with Blue instead of red crosses and and front chest an tac pad monitor witch displays a blinking red cross and a text with says (you fuck up i patch up) the armor also seems to be fitted with a holographic cat tail"
-	name = "M52BMC"
+/obj/item/clothing/suit/spaceeva/eva/riley
+	desc = "BMPOI-89  a white breats plate for UNSC pilots wich is save for EVA"
+	name = "BMPOI-89 Chest Plate"
 	item_state = "riley-armor_worn"
 	icon_state = "riley-armor_obj"
 
+/obj/item/clothing/shoes/eva/marine/riley
+	desc = "BOPOI-89 white armord boots for UNSC pilots, wich are save for EV"
+	name = "BOPOI-89 Combat Boots"
+	item_state = "riley-boots_worn"
+	icon_state = "riley-boots_obj"
+
+/obj/item/weapon/storage/backpack/odst/regular/riley
+	desc = "A UNSC Backpack designated for Pilots"
+	name = "UNSC Pilot Backpack"
+	item_state = "riley-backpack_worn"
+	icon_state = "riley-backpack_obj"
 
 /decl/hierarchy/outfit/riley_marine
 	name = "riley - marine"
-	suit = /obj/item/clothing/suit/storage/marine/riley
-	head = /obj/item/clothing/head/helmet/marine/riley
-
+	suit = /obj/item/clothing/suit/spaceeva/eva/riley
+	shoes = /obj/item/clothing/shoes/eva/marine/riley
+	head = /obj/item/clothing/head/helmet/eva/marine/riley
+	back = /obj/item/weapon/storage/backpack/odst/regular/riley
 
 #undef ODST_OVERRIDE
 #undef ITEM_INHAND
